@@ -9,6 +9,7 @@ const adminRoutes = require("./src/routes/admin/auth");
 const categoryRoutes = require("./src/routes/category");
 const productRoutes = require("./src/routes/product");
 const cartRoutes = require("./src/routes/cart");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -23,20 +24,21 @@ app.use("/public", express.static(path.join(__dirname, "src/uploads")));
 
 // database connection
 mongoose
-  .connect(
-    `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@cluster0.oyja1ys.mongodb.net/${MONGO_DB_DATABASE}?retryWrites=true&w=majority`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
+.connect(
+  `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@cluster0.oyja1ys.mongodb.net/${MONGO_DB_DATABASE}?retryWrites=true&w=majority`,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
   )
   .then(() => {
-    console.log("Database connected");
+    console.log("Database connected successfully");
   })
   .catch((err) => {
     console.log("Database not connected", err);
   });
-
+  
+app.use(cors());
 app.use("/api", authRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", categoryRoutes);
