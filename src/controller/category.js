@@ -19,7 +19,7 @@ exports.addCategory = async (req, res) => {
       console.log(_category);
       return await res.status(200).json({
         message: "category created successfully!",
-        data: _category,
+        _category,
       });
     } else {
       return await res.status(400).json({
@@ -49,6 +49,7 @@ function filterCategories(categories, parentid = null) {
       _id: cate._id,
       name: cate.name,
       slug: cate.slug,
+      parentid :cate.parentid,
       children: filterCategories(categories, cate._id),
     });
   }
@@ -62,8 +63,7 @@ exports.getCategories = async (req, res) => {
     if (_categories.length > 0) {
       const categoryList = filterCategories(_categories);
       return res.status(200).json({
-        message: "Categories fetched successfully!",
-        data: categoryList,
+        categoryList,
       });
     } else {
       return res.status(200).json({

@@ -1,12 +1,14 @@
 const User = require("../../model/user");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const user = require("../../model/user");
+const shortid = require("shortid");
 
 exports.signup = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   try {
     const userdata = await User.findOne({ email: email });
-
+    
+    const hash_password = await bcrypt.hash(password,10);
     if (userdata) {
       return res.status(400).json({
         message: `Admin already exist!`,
@@ -16,8 +18,8 @@ exports.signup = async (req, res) => {
         firstname,
         lastname,
         email,
-        password,
-        username: Math.random().toString(),
+        hash_password,
+        username: shortid.generate(),
         role: "admin",
       });
 
@@ -49,11 +51,11 @@ exports.signin = async (req, res) => {
           { _id: userdata._id, role: userdata.role },
           process.env.JWT_SECRET,
           {
-            expiresIn: "1h",
+            expiresIn: "1d",
           }
         );
         const { _id, firstname, lastname, email, role, fullname } = userdata;
-        res.cookie("token",token,{expiresIn:"1h"});
+        res.cookie("token",token,{expiresIn:"1d"});
         res.status(200).json({
           token,
           user: {
@@ -71,7 +73,7 @@ exports.signin = async (req, res) => {
         });
       }
     } else {
-      return res.status(203).json({
+      return res.status(400).json({
         message: "user not registered please login first",
       });
     }

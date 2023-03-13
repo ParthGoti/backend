@@ -1,5 +1,5 @@
 const app = require("express");
-const { addProduct } = require("../controller/product");
+const { addProduct, getProductBySlug } = require("../controller/product");
 const router = app.Router();
 const {
   adminMiddleware,
@@ -26,5 +26,7 @@ router.post(
   upload.array("productImg"),
   addProduct
 );
+
+router.get("/products/:slug",getProductBySlug)
 
 module.exports = router;

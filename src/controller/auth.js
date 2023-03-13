@@ -1,11 +1,13 @@
 const User = require("../model/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const shortid = require("shortid");
 
 exports.signup = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   try {
     const userdata = await User.findOne({ email: email });
-
+    const hash_password = await bcrypt.hash(password,10);
     if (userdata) {
       return res.status(400).json({
         message: `user already exist with ${email}`,
@@ -15,8 +17,8 @@ exports.signup = async (req, res) => {
         firstname,
         lastname,
         email,
-        password,
-        username: Math.random().toString(),
+        hash_password,
+        username: shortid.generate(),
       });
 
       if (_user) {

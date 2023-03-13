@@ -9,6 +9,7 @@ const adminRoutes = require("./src/routes/admin/auth");
 const categoryRoutes = require("./src/routes/category");
 const productRoutes = require("./src/routes/product");
 const cartRoutes = require("./src/routes/cart");
+const initialDataRoutes = require("./src/routes/admin/initialData");
 const cors = require("cors");
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api", adminRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", productRoutes);
 app.use("/api", cartRoutes);
+app.use("/api", initialDataRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

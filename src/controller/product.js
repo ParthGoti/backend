@@ -1,6 +1,7 @@
 const Product = require("../model/product");
 const shortid = require("shortid");
 const { default: slugify } = require("slugify");
+const Category = require("../model/category");
 
 exports.addProduct = async (req, res) => {
   const { name, price, description, category, quantity } = req.body;
@@ -24,11 +25,11 @@ exports.addProduct = async (req, res) => {
       description,
       productPictures,
       category,
-      createdBy:req.user._id,
+      createdBy: req.user._id,
     };
     const _product = await Product.create(productObj);
     if (_product) {
-    //   console.log(_product);
+      //   console.log(_product);
       return await res.status(200).json({
         message: "product created successfully!",
         data: _product,
@@ -36,6 +37,44 @@ exports.addProduct = async (req, res) => {
     } else {
       return await res.status(400).json({
         message: "something went wrong!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error!",
+      error: error,
+    });
+  }
+};
+
+exports.getProductBySlug = async (req, res) => {
+  const { slug } = req.params;
+  try {
+    const category = await Category.findOne({ slug: slug }).select("_id");
+    // console.log(result);
+    if (category) {
+      const products = await Product.find({ category: category._id });
+      // console.log(products);
+          if (products.length > 0) {
+            res.status(200).json({
+              products,
+              productsByPrice : {
+                under5k : products.filter(product => product.price <= 5000),
+                under10k : products.filter(product => product.price > 5000 && product.price <= 10000 ),
+                under15k : products.filter(product => product.price > 10000 && product.price <= 15000 ),
+                under20k : products.filter(product => product.price > 15000 && product.price <= 20000 ),
+                under30k : products.filter(product => product.price > 20000 && product.price <= 30000 ),
+              }
+            });
+          } else {
+            return res.status(400).json({
+              message: "No Product Avialable",
+            });
+          }
+    } else {
+      return res.status(400).json({
+        message: "Something Went Wrong!",
       });
     }
   } catch (error) {
