@@ -18,6 +18,7 @@ function filterCategories(categories, parentid = null) {
         name: cate.name,
         slug: cate.slug,
         parentid :cate.parentid,
+        type:cate.type,
         children: filterCategories(categories, cate._id),
       });
     }

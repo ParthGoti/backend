@@ -1,5 +1,9 @@
 const app = require("express");
-const { addProduct, getProductBySlug } = require("../controller/product");
+const {
+  addProduct,
+  getProductBySlug,
+  getProductDetailsById,
+} = require("../controller/product");
 const router = app.Router();
 const {
   adminMiddleware,
@@ -11,7 +15,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(path.dirname(__dirname),'uploads'));
+    cb(null, path.join(path.dirname(__dirname), "uploads"));
   },
   filename: function (req, file, cb) {
     cb(null, shortid.generate() + "-" + file.originalname);
@@ -27,6 +31,7 @@ router.post(
   addProduct
 );
 
-router.get("/products/:slug",getProductBySlug)
+router.get("/products/:slug", getProductBySlug);
+router.get("/product/:productId", getProductDetailsById);
 
 module.exports = router;

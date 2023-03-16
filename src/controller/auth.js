@@ -45,8 +45,9 @@ exports.signin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userdata = await User.findOne({ email: email });
+    console.log(userdata);
     if (userdata) {
-      if (userdata.authenticate(password)) {
+      if (userdata.authenticate(password) && userdata.role === 'user') {
         const token = jwt.sign(
           { _id: userdata._id, role: userdata.role },
           process.env.JWT_SECRET,
@@ -57,7 +58,7 @@ exports.signin = async (req, res) => {
         const { _id, firstname, lastname, email, role, fullname } = userdata;
         res.status(200).json({
           token,
-          User: {
+          user: {
             _id,
             firstname,
             lastname,
@@ -68,7 +69,7 @@ exports.signin = async (req, res) => {
         });
       } else {
         return await res.status(400).json({
-          message: "Invalid password!",
+          message: "Something Went Wrong",
         });
       }
     } else {

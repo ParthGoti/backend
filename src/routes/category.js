@@ -1,5 +1,10 @@
 const app = require("express");
-const { addCategory, getCategories } = require("../controller/category");
+const {
+  addCategory,
+  getCategories,
+  updateCategory,
+  deleteCategory,
+} = require("../controller/category");
 const {
   adminMiddleware,
   requireSignin,
@@ -27,5 +32,7 @@ router.post(
   addCategory
 );
 router.get("/category/get", getCategories);
+router.post("/category/update", upload.array("categoryImage"), updateCategory);
+router.post("/category/delete", deleteCategory);
 
 module.exports = router;

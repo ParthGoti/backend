@@ -85,3 +85,25 @@ exports.getProductBySlug = async (req, res) => {
     });
   }
 };
+
+exports.getProductDetailsById = async (req,res) =>{
+  const { productId } = req.params;
+  console.log(productId);
+  if (productId) {
+    const product = await Product.findOne({_id:productId});
+    if (product) {
+      return res.status(200).json({
+        product
+      })
+    } else {
+      return res.status(400).json({
+        product,
+        error : "something Went wrong"
+      })
+    }
+  } else {
+    return res.status(400).json({
+      error :"Params Required"
+    })
+  }
+}
