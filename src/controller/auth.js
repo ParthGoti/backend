@@ -3,17 +3,23 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const shortid = require("shortid");
 
+const generateJwtToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+};
+
 exports.signup = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   try {
     const userdata = await User.findOne({ email: email });
-    const hash_password = await bcrypt.hash(password,10);
+    const hash_password = await bcrypt.hash(password, 10);
     if (userdata) {
       return res.status(400).json({
         message: `user already exist with ${email}`,
       });
     } else {
-      const _user = await User.create({
+      const user = await User.create({
         firstname,
         lastname,
         email,
@@ -21,11 +27,13 @@ exports.signup = async (req, res) => {
         username: shortid.generate(),
       });
 
-      if (_user) {
-        console.log("user", _user);
+      if (user) {
+        console.log("user", user);
+        const token = generateJwtToken(user._id, user.role);
+        const { _id, firstname, lastname, email, role, fullname } = user;
         return res.status(200).json({
-          message: "user created successfully!",
-          data: _user,
+          token,          
+          user: { _id, firstname, lastname, email, role, fullname },
         });
       } else {
         return res.status(400).json({
@@ -47,14 +55,10 @@ exports.signin = async (req, res) => {
     const userdata = await User.findOne({ email: email });
     console.log(userdata);
     if (userdata) {
-      if (userdata.authenticate(password) && userdata.role === 'user') {
-        const token = jwt.sign(
-          { _id: userdata._id, role: userdata.role },
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "1h",
-          }
-        );
+      const isPassword = await userdata.authenticate(password);
+      console.log(isPassword);
+      if (isPassword && userdata.role === "user") {
+        const token = generateJwtToken(userdata._id, userdata.role);
         const { _id, firstname, lastname, email, role, fullname } = userdata;
         res.status(200).json({
           token,

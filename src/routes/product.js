@@ -3,6 +3,8 @@ const {
   addProduct,
   getProductBySlug,
   getProductDetailsById,
+  deleteProductById,
+  getProducts,
 } = require("../controller/product");
 const router = app.Router();
 const {
@@ -33,5 +35,17 @@ router.post(
 
 router.get("/products/:slug", getProductBySlug);
 router.get("/product/:productId", getProductDetailsById);
+router.delete(
+  "/product/deleteProductById",
+  requireSignin,
+  adminMiddleware,
+  deleteProductById
+);
+router.post(
+  "/product/getProducts",
+  requireSignin,
+  adminMiddleware,
+  getProducts
+);
 
 module.exports = router;

@@ -7,8 +7,8 @@ exports.signup = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   try {
     const userdata = await User.findOne({ email: email });
-    
-    const hash_password = await bcrypt.hash(password,10);
+
+    const hash_password = await bcrypt.hash(password, 10);
     if (userdata) {
       return res.status(400).json({
         message: `Admin already exist!`,
@@ -46,7 +46,7 @@ exports.signin = async (req, res) => {
     const { email, password } = req.body;
     const userdata = await User.findOne({ email: email });
     if (userdata) {
-      if (userdata.authenticate(password) && userdata.role === "admin") {
+      if ( await userdata.authenticate(password) && userdata.role === "admin") {
         const token = jwt.sign(
           { _id: userdata._id, role: userdata.role },
           process.env.JWT_SECRET,
@@ -55,7 +55,7 @@ exports.signin = async (req, res) => {
           }
         );
         const { _id, firstname, lastname, email, role, fullname } = userdata;
-        res.cookie("token",token,{expiresIn:"1d"});
+        res.cookie("token", token, { expiresIn: "1d" });
         res.status(200).json({
           token,
           user: {
@@ -86,9 +86,9 @@ exports.signin = async (req, res) => {
   }
 };
 
-exports.signout = async (req,res) =>{
-   res.clearCookie("token");
-   res.status(200).json({
-    message:"signout successfully...!"
-   })
-}
+exports.signout = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({
+    message: "signout successfully...!",
+  });
+};
